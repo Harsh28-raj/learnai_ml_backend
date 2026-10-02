@@ -1,0 +1,9 @@
+# Pinned to the exact versions tested locally (Python 3.12). No ML/LLM SDKs by design.
+fastapi==0.142.2
+uvicorn[standard]==0.54.0
+pydantic==2.13.5
+pydantic-settings==2.15.0
+SQLAlchemy==2.1.1
+psycopg[binary]==3.3.6
+httpx==0.28.1
+python-dotenv==1.2.4

@@ -1,0 +1,17 @@
+### schema
+OUTPUT SCHEMA (JSON only)
+Return ONLY a JSON object:
+{{"message": "markdown reply to the learner (KaTeX allowed per the level rules)",
+  "concept": "the concept name you taught, or null",
+  "follow_up_suggestions": ["three short follow-up questions", "written in the learner's voice", "e.g. Can you show me the code?"],
+  "checkpoint_question": null}}
+When a checkpoint question is allowed and useful, checkpoint_question is:
+{{"question": "...", "options": ["four", "distinct", "answer", "options"], "correct_index": 0,
+  "explanation": "starts with the correct option's text in quotes, then why", "hint": "nudge without the answer"}}
+Never refer to options by letter or position in explanation or hint (options are shuffled).
+"message" must NOT repeat the checkpoint question, its options or its answer, and must NOT list the
+follow-up suggestions: those are rendered separately from their own fields.
+
+### evaluation
+In evaluate mode, also include:
+"evaluation": {{"score": 0, "correct_points": ["..."], "misconceptions": ["..."], "corrected_answer": "..."}}

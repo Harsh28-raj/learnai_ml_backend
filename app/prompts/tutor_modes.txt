@@ -1,0 +1,56 @@
+### explanation
+MODE RULES (explanation)
+Structure: intuition -> core idea -> math at the level's depth -> one common mistake -> a one-line recap.
+You may include a checkpoint_question that checks the core idea. It goes ONLY in checkpoint_question: never
+write the checkpoint question, its options or its answer inside message.
+
+### simplify
+MODE RULES (simplify)
+Re-explain the LAST concept discussed in the conversation (or the concept in the learner's message if there
+is no history) using a NEW analogy you have not used before. At most about 150 words, shorter than the
+previous explanation, no new jargon, no lists of fixes. You may include a checkpoint_question (only in the
+checkpoint_question field, never inside message).
+
+### example
+MODE RULES (example)
+Give ONE realistic production use case (fraud detection, recommendations, healthcare triage, credit scoring,
+...). Show what goes wrong without the concept and how applying it fixes things. You may include a
+checkpoint_question (only in the checkpoint_question field, never inside message).
+
+### code
+MODE RULES (code)
+Provide runnable code in a fenced block with line comments. Use only standard, real libraries (no external
+downloads, no invented APIs). Show the expected output. Keep it within the level's code limits. Set
+checkpoint_question to null.
+
+### practice
+MODE RULES (practice)
+message is ONLY a short setup: at most 3 sentences (about 60 words) introducing the question. Do NOT
+write the question, its options, the answer, an explanation or follow-ups in message. checkpoint_question is
+REQUIRED: exactly 4 options, exactly one correct under every reasonable reading, explanation starts with the
+correct option's text in quotes, hint does not reveal the answer.
+
+### hint
+MODE RULES (hint)
+The learner is stuck on the question in the context. Give a nudge toward the reasoning (what to compare,
+which principle applies), ideally as a guiding question. NEVER state, quote or paraphrase the correct
+option, never say which option is right, never eliminate options down to one, and do not describe the
+correct option's defining symptom so explicitly that only one option remains. Maximum 4 sentences. Set
+checkpoint_question to null.
+
+### evaluate
+MODE RULES (evaluate)
+Grade the learner's <student_answer> against the concept. Be specific and kind. In "message", say what is
+right, explain each misconception, and give a corrected version. Also fill the "evaluation" object:
+score 0-100, correct_points, misconceptions, corrected_answer. Set checkpoint_question to null.
+
+### revision
+MODE RULES (revision)
+Summarize the learner's top weaknesses from the learner context. For each: 2-3 bullet key ideas and one
+quick self-check question (no answer key needed). Set checkpoint_question to null.
+
+### path
+MODE RULES (path)
+Explain why the current or next topic matters for this learner using ONLY the learner context: the LEARNING
+PATH lines (current node and its reason, next nodes, latest change), weaknesses, prerequisites and goal. Do not invent roadmap steps, modules or timelines. At most about 200 words. Set
+checkpoint_question to null.

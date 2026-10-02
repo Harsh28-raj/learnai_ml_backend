@@ -1,0 +1,242 @@
+[
+  {
+    "id": "fb-py-1",
+    "concept_id": "python_data_structures",
+    "category": "Python",
+    "difficulty": "Easy",
+    "title": "Looking Up a Patient Record Quickly",
+    "question": "A clinic stores 50,000 patient records and needs to fetch a record instantly by patient ID. Which Python data structure is the best fit?",
+    "code_snippet": null,
+    "options": [
+      "A dict keyed by patient ID",
+      "A list of tuples scanned in a loop",
+      "A string with all records joined together",
+      "A set of patient names"
+    ],
+    "correct_index": 0,
+    "explanation": "A dict maps keys to values with average O(1) lookup, so fetching by ID is instant. Scanning a list is O(n), a joined string must be parsed, and a set of names cannot hold the record data or be searched by ID.",
+    "hint": "Think about which structure lets you jump straight to an item using a key instead of checking every item.",
+    "scenario_domain": "healthcare",
+    "question_angle": "concept_check"
+  },
+  {
+    "id": "fb-py-2",
+    "concept_id": "matrix_shapes",
+    "category": "Python",
+    "difficulty": "Medium",
+    "title": "Shape Mismatch in a Credit Scoring Model",
+    "question": "X has shape (500, 8) (500 applicants, 8 features) and the weight vector w has shape (8,). What is the shape of X @ w?",
+    "code_snippet": "import numpy as np\nX = np.random.rand(500, 8)\nw = np.random.rand(8)\nscores = X @ w",
+    "options": [
+      "(500,)",
+      "(8,)",
+      "(500, 8)",
+      "It raises a ValueError"
+    ],
+    "correct_index": 0,
+    "explanation": "Matrix-vector multiplication of (500, 8) with (8,) contracts the shared dimension of 8 and leaves one score per applicant. (8,) would require contracting over the 500 rows instead (X.T @ v), (500, 8) is what element-wise X * w broadcasting gives, and there is no error because the inner dimensions match.",
+    "hint": "In A @ B the inner dimensions must match and disappear; the outer dimensions remain.",
+    "scenario_domain": "finance/credit",
+    "question_angle": "code_debugging"
+  },
+  {
+    "id": "fb-stats-1",
+    "concept_id": "std_variance",
+    "category": "Statistics",
+    "difficulty": "Easy",
+    "title": "Comparing Delivery Time Consistency",
+    "question": "Two warehouses both average 3 days per delivery. Warehouse A has a standard deviation of 0.5 days and Warehouse B has 2 days. What does this tell you?",
+    "code_snippet": null,
+    "options": [
+      "Warehouse A delivers more consistently",
+      "Warehouse B is faster on average",
+      "Both warehouses are equally reliable",
+      "Warehouse A has more deliveries"
+    ],
+    "correct_index": 0,
+    "explanation": "Standard deviation measures spread around the average. With the same mean, the smaller spread (0.5 days) means A's delivery times cluster tightly around 3 days. The averages are equal so neither is faster, reliability differs, and spread says nothing about volume.",
+    "hint": "Standard deviation describes how spread out values are, not how large they are.",
+    "scenario_domain": "e-commerce",
+    "question_angle": "concept_check"
+  },
+  {
+    "id": "fb-stats-2",
+    "concept_id": "hypothesis_testing",
+    "category": "Statistics",
+    "difficulty": "Medium",
+    "title": "Interpreting an A/B Test p-value",
+    "question": "A new course layout is A/B tested and the completion-rate difference has p = 0.03 with a significance level of 0.05. What is the correct interpretation?",
+    "code_snippet": null,
+    "options": [
+      "If there were truly no difference, a result this extreme would occur about 3% of the time",
+      "There is a 97% probability that the new layout is better",
+      "The new layout improves completion by 3%",
+      "There is a 3% probability that the null hypothesis is true"
+    ],
+    "correct_index": 0,
+    "explanation": "A p-value is the probability of data at least this extreme assuming the null hypothesis is true. It is not the probability that either hypothesis is true, and it says nothing about the size of the effect.",
+    "hint": "A p-value is computed by assuming the null hypothesis holds; ask what it is a probability of.",
+    "scenario_domain": "education",
+    "question_angle": "formula_interpretation"
+  },
+  {
+    "id": "fb-ml-1",
+    "concept_id": "bias_variance",
+    "category": "Machine Learning",
+    "difficulty": "Medium",
+    "title": "Diagnosing a Fraud Model from Train and Validation Accuracy",
+    "question": "A fraud-detection model reaches 99% training accuracy but only 63% validation accuracy. What is the most likely diagnosis?",
+    "code_snippet": null,
+    "options": [
+      "High variance (overfitting)",
+      "High bias (underfitting)",
+      "The learning rate is too small",
+      "The validation set is too large"
+    ],
+    "correct_index": 0,
+    "explanation": "A large gap between near-perfect training accuracy and much lower validation accuracy means the model memorized training noise and fails to generalize: high variance. High bias would show poor accuracy on both sets, and neither the learning rate nor a large validation set explains the gap.",
+    "hint": "Compare how the model does on data it has seen versus data it has not seen.",
+    "scenario_domain": "finance/credit",
+    "question_angle": "curve_or_metric_diagnosis"
+  },
+  {
+    "id": "fb-ml-2",
+    "concept_id": "regularization",
+    "category": "Machine Learning",
+    "difficulty": "Hard",
+    "title": "Ridge Penalty Pushed Too Far",
+    "question": "Increasing Ridge alpha from 0.1 to 1000 makes BOTH training and validation error rise sharply on a crop-yield regression. What happened?",
+    "code_snippet": "from sklearn.linear_model import Ridge\nmodel = Ridge(alpha=1000.0).fit(X_train, y_train)",
+    "options": [
+      "The penalty shrank coefficients so much that the model now underfits",
+      "The model now overfits the training data",
+      "The solver diverged because alpha is too large",
+      "The features leaked target information"
+    ],
+    "correct_index": 0,
+    "explanation": "A huge L2 penalty drives coefficients toward zero, reducing model flexibility until it cannot capture the signal, so both errors rise (high bias). Overfitting would lower training error, Ridge has a closed-form solution that does not diverge, and leakage would make validation error look too good.",
+    "hint": "Think about what happens to model flexibility when every weight is forced close to zero.",
+    "scenario_domain": "agriculture",
+    "question_angle": "hyperparameter_tuning"
+  },
+  {
+    "id": "fb-dl-1",
+    "concept_id": "neural_networks",
+    "category": "Deep Learning",
+    "difficulty": "Easy",
+    "title": "Why Neural Networks Need Activation Functions",
+    "question": "An engineer builds a 5-layer network for defect detection but removes every activation function. What is the consequence?",
+    "code_snippet": null,
+    "options": [
+      "The whole network collapses into a single linear transformation",
+      "The network trains faster and becomes more accurate",
+      "The network can only output probabilities",
+      "Backpropagation stops working entirely"
+    ],
+    "correct_index": 0,
+    "explanation": "Stacking linear layers without non-linear activations is still one linear function, so the extra depth adds no expressive power. It does not improve accuracy, does not force probability outputs, and gradients can still be computed.",
+    "hint": "Consider what you get when you combine several linear functions with each other.",
+    "scenario_domain": "manufacturing",
+    "question_angle": "concept_check"
+  },
+  {
+    "id": "fb-dl-2",
+    "concept_id": "backpropagation",
+    "category": "Deep Learning",
+    "difficulty": "Hard",
+    "title": "Vanishing Gradients in a Deep Sigmoid Network",
+    "question": "A 20-layer network with sigmoid activations trains well in its last layers but its first layers barely change. What is the most likely cause?",
+    "code_snippet": null,
+    "options": [
+      "Repeated multiplication by small sigmoid derivatives shrinks gradients toward the early layers",
+      "The learning rate is too high for the early layers",
+      "The early layers have too few parameters to update",
+      "The loss function is not differentiable"
+    ],
+    "correct_index": 0,
+    "explanation": "The sigmoid derivative is at most 0.25, and backpropagation multiplies these derivatives layer by layer, so gradients reaching early layers become vanishingly small. A high learning rate would cause instability rather than stagnation, parameter count does not stop updates, and a non-differentiable loss would break training everywhere.",
+    "hint": "Backpropagation applies the chain rule; think about what happens when many numbers below one are multiplied together.",
+    "scenario_domain": "autonomous vehicles",
+    "question_angle": "scenario_diagnosis"
+  },
+  {
+    "id": "fb-nlp-1",
+    "concept_id": "word_embeddings",
+    "category": "NLP",
+    "difficulty": "Easy",
+    "title": "What Embeddings Capture",
+    "question": "A social media platform represents each word as a dense embedding vector. Why do the vectors for 'happy' and 'joyful' end up close together?",
+    "code_snippet": null,
+    "options": [
+      "They appear in similar contexts, so training places them near each other",
+      "They have a similar number of letters",
+      "They were manually assigned nearby IDs in the vocabulary",
+      "Embeddings sort words alphabetically"
+    ],
+    "correct_index": 0,
+    "explanation": "Embedding methods learn from co-occurrence: words used in similar contexts get similar vectors, which captures meaning. Word length, vocabulary IDs and alphabetical order do not determine embedding geometry.",
+    "hint": "Embeddings are learned from how words are used around other words.",
+    "scenario_domain": "social media",
+    "question_angle": "concept_check"
+  },
+  {
+    "id": "fb-nlp-2",
+    "concept_id": "transformers_attention",
+    "category": "NLP",
+    "difficulty": "Hard",
+    "title": "Why Attention Scores Are Scaled",
+    "question": "Scaled dot-product attention divides QK^T by sqrt(d_k). In a security log classifier with d_k = 512, what goes wrong if this scaling is removed?",
+    "code_snippet": null,
+    "options": [
+      "Large dot products saturate the softmax, producing near one-hot weights and tiny gradients",
+      "Attention weights no longer sum to one",
+      "The model can no longer attend to earlier tokens",
+      "Memory use grows from quadratic to cubic in sequence length"
+    ],
+    "correct_index": 0,
+    "explanation": "The variance of a dot product grows with d_k, so unscaled scores become large and push softmax into saturated regions where gradients vanish. Softmax still normalizes to one, causal masking is unrelated, and the memory cost stays quadratic.",
+    "hint": "Consider how the magnitude of a dot product grows with dimension, and how softmax behaves on very large inputs.",
+    "scenario_domain": "cybersecurity",
+    "question_angle": "formula_interpretation"
+  },
+  {
+    "id": "fb-genai-1",
+    "concept_id": "prompt_engineering",
+    "category": "Generative AI",
+    "difficulty": "Easy",
+    "title": "Getting Consistent Output Format",
+    "question": "A sports analytics app asks an LLM to summarize matches but the output format changes every time. What is the most effective first fix?",
+    "code_snippet": null,
+    "options": [
+      "Give an explicit format specification with one or two examples in the prompt",
+      "Ask the same question several times and pick the longest answer",
+      "Increase the temperature to make the model more creative",
+      "Remove all instructions so the model is not confused"
+    ],
+    "correct_index": 0,
+    "explanation": "Explicit format instructions plus few-shot examples anchor the model to a consistent structure. Picking the longest answer does not fix format, higher temperature increases variability, and removing instructions makes the output less predictable.",
+    "hint": "Models imitate patterns they are shown; think about what you could show the model.",
+    "scenario_domain": "sports analytics",
+    "question_angle": "scenario_diagnosis"
+  },
+  {
+    "id": "fb-genai-2",
+    "concept_id": "rag_chunking",
+    "category": "Generative AI",
+    "difficulty": "Hard",
+    "title": "Retrieval Misses in a Policy-Document RAG System",
+    "question": "A RAG assistant over insurance policies uses fixed 2,000-token chunks. Answers often cite the right document but miss the specific clause asked about. What is the most likely fix?",
+    "code_snippet": null,
+    "options": [
+      "Use smaller, structure-aware chunks with some overlap so each embedding represents one focused idea",
+      "Increase the chunk size so each chunk contains the whole policy",
+      "Switch to a larger LLM without changing retrieval",
+      "Lower the number of retrieved chunks to one"
+    ],
+    "correct_index": 0,
+    "explanation": "Very large chunks average many topics into one embedding, diluting the clause's meaning so similarity search returns the right document but not the right passage. Focused, overlapping, structure-aware chunks make the embedding match the specific clause. Bigger chunks worsen dilution, a bigger LLM cannot use text it never receives, and fewer chunks reduces recall.",
+    "hint": "An embedding of a long passage blends together every topic inside it.",
+    "scenario_domain": "finance/credit",
+    "question_angle": "scenario_diagnosis"
+  }
+]

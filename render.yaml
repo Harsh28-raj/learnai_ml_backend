@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: learnai-ml-backend
+    runtime: python
+    plan: free
+    region: singapore  # same region as the Neon database (ap-southeast-1): lowest DB latency
+    buildCommand: pip install -r requirements.txt
+    # Single worker: rate limits and caches are in-process; 512 MB RAM on the free tier.
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1 --proxy-headers --forwarded-allow-ips "*"
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: DATABASE_URL
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_MODEL_MAIN
+        value: openai/gpt-oss-120b
+      - key: GROQ_MODEL_FAST
+        value: openai/gpt-oss-20b
+      - key: GROQ_REASONING_EFFORT
+        value: low
+      - key: VERIFY_QUESTIONS
+        value: "true"
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: ENABLE_DOCS
+        value: "true"
+      - key: TUTOR_SUPPORT_TEXT
+        value: "If you're feeling overwhelmed, please reach out to someone you trust or call Tele-MANAS at 14416 (India)."
+      - key: RATE_LIMIT_LLM_PER_MIN
+        value: "20"
+      - key: RATE_LIMIT_OTHER_PER_MIN
+        value: "120"
