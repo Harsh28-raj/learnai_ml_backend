@@ -11,7 +11,7 @@ from tests.test_questions import approve_all, item, llm_response
 from tests.test_tutor import checkpoint, reply, verify_ok
 
 from app.api_docs import EXAMPLES
-from app.config import Settings, get_settings
+from app.config import FRONTEND_ORIGINS, Settings, get_settings
 from app.models import Learner, Question
 from app.protection import RateLimiter, limiter
 from app.seed import SEED_QUESTION_ID, ensure_pool_learners, ensure_seed_questions, seed_if_empty
@@ -132,10 +132,15 @@ class TestBodyLimitAndCors(unittest.TestCase):
 
     def test_cors_star(self):
         self.assertEqual(Settings(allowed_origins="*").cors_origins, ["*"])
-        self.assertEqual(Settings(allowed_origins="http://a.com, http://b.com").cors_origins,
-                         ["http://a.com", "http://b.com"])
-        r = _support.client().get("/health", headers={"Origin": "http://localhost:5173"})
-        self.assertEqual(r.headers.get("access-control-allow-origin"), "http://localhost:5173")
+        # Configured origins (a trailing "/" is tolerated) plus the team's frontends, always allowed.
+        self.assertEqual(Settings(allowed_origins="http://a.com, http://b.com/").cors_origins,
+                         ["http://a.com", "http://b.com", *FRONTEND_ORIGINS])
+        self.assertIn("https://ai-tutor-mauve-kappa.vercel.app", Settings(allowed_origins="").cors_origins)
+        for origin in ("http://localhost:5173", "https://ai-tutor-mauve-kappa.vercel.app", "http://localhost:8081"):
+            r = _support.client().get("/health", headers={"Origin": origin})
+            self.assertEqual(r.headers.get("access-control-allow-origin"), origin)
+        r = _support.client().get("/health", headers={"Origin": "https://evil.example"})
+        self.assertIsNone(r.headers.get("access-control-allow-origin"))
 
 
 class TestIdempotentStartup(unittest.TestCase):

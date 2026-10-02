@@ -22,7 +22,7 @@ git push -u origin main
 |---|---|
 | `DATABASE_URL` | The Neon connection string, as given (the `-pooler` host is fine). `postgresql://` is rewritten to the psycopg driver automatically. |
 | `GROQ_API_KEY` | Your Groq API key (from console.groq.com). |
-| `ALLOWED_ORIGINS` | `*` for the hackathon, so any frontend origin works. CORS is sent without credentials. Later, set it to the real frontend URL(s), comma-separated. |
+| `ALLOWED_ORIGINS` | `*` for the hackathon, so any frontend origin works. CORS is sent without credentials. Later, set it to the real frontend URL(s), comma-separated. The team frontend `https://ai-tutor-mauve-kappa.vercel.app` and `http://localhost:8081` are always allowed in code (`FRONTEND_ORIGINS` in `app/config.py`), whatever this is set to. |
 | `GROQ_MODEL_MAIN` | `openai/gpt-oss-120b` (preset) |
 | `GROQ_MODEL_FAST` | `openai/gpt-oss-20b` (preset) |
 | `GROQ_REASONING_EFFORT` | `low` (preset) |

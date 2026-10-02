@@ -17,6 +17,14 @@ def normalize_database_url(url: str) -> str:
 
 APP_VERSION = "1.0.0"
 
+# The team's frontends are always allowed, in addition to ALLOWED_ORIGINS, so a code push is
+# enough for them to work on any deployment. Browser origins have no trailing slash.
+FRONTEND_ORIGINS: tuple[str, ...] = (
+    "https://ai-tutor-mauve-kappa.vercel.app",
+    "http://localhost:8081",
+    "http://127.0.0.1:8081",
+)
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
@@ -42,8 +50,10 @@ class Settings(BaseSettings):
 
     @property
     def cors_origins(self) -> list[str]:
-        origins = [o.strip() for o in self.allowed_origins.split(",") if o.strip()]
-        return ["*"] if "*" in origins else origins
+        origins = [o.strip().rstrip("/") for o in self.allowed_origins.split(",") if o.strip()]
+        if "*" in origins:
+            return ["*"]
+        return list(dict.fromkeys(origins + list(FRONTEND_ORIGINS)))
 
     @property
     def db_type(self) -> str:
