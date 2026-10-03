@@ -1,468 +1,636 @@
-# LearnAI — ML/AI Backend (Phase 1)
+<div align="center">
 
-FastAPI service that holds the learner knowledge model for LearnAI. It is built to fit the Render free tier: 512 MB RAM, a single worker, and no heavy ML libraries.
+# 🎓 LearnAI — Personalized AI Tutor
 
-Phase 1 added the learner model, the concept DAG, three seeded demo learners, a single action endpoint, and a Groq client stub.
+### An adaptive learning platform that teaches AI/ML the way *you* need to learn it
 
-Phase 2 adds the core closed loop that runs on every answer:
+**It diagnoses what you know, finds where you struggle, adapts difficulty in real time, and rebuilds your learning path after every answer.**
+
+[![Live App](https://img.shields.io/badge/Live%20App-Vercel-000000?style=for-the-badge&logo=vercel)](https://ai-tutor-mauve-kappa.vercel.app/)
+[![API](https://img.shields.io/badge/ML%20API-Render-46E3B7?style=for-the-badge&logo=render)](https://learnai-ml-backend.onrender.com/health)
+[![Docs](https://img.shields.io/badge/API%20Docs-Swagger-85EA2D?style=for-the-badge&logo=swagger)](https://learnai-ml-backend.onrender.com/docs)
+
+![React](https://img.shields.io/badge/React_18-20232A?style=flat-square&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Tailwind](https://img.shields.io/badge/Tailwind-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white)
+![Python](https://img.shields.io/badge/Python_3.12-3776AB?style=flat-square&logo=python&logoColor=white)
+![Groq](https://img.shields.io/badge/Groq-F55036?style=flat-square)
+![Postgres](https://img.shields.io/badge/Neon_Postgres-4169E1?style=flat-square&logo=postgresql&logoColor=white)
+![Tests](https://img.shields.io/badge/tests-237%20passing-brightgreen?style=flat-square)
+
+</div>
+
+---
+
+## 📌 Table of Contents
+
+- [The Problem](#-the-problem)
+- [The Solution](#-the-solution)
+- [Live Demo](#-live-demo)
+- [Key Features](#-key-features)
+- [System Architecture](#-system-architecture)
+- [The Closed Learning Loop](#-the-closed-learning-loop)
+- [ML Intelligence Layer — Deep Dive](#-ml-intelligence-layer--deep-dive)
+- [LLM Pipeline & Guardrails](#-llm-pipeline--guardrails)
+- [API Reference](#-api-reference)
+- [Tech Stack](#-tech-stack)
+- [Project Structure](#-project-structure)
+- [Getting Started](#-getting-started)
+- [Environment Variables](#-environment-variables)
+- [Deployment](#-deployment)
+- [Testing & Evaluation](#-testing--evaluation)
+- [Performance](#-performance)
+- [Demo Walkthrough](#-demo-walkthrough)
+- [Roadmap](#-roadmap)
+- [Team](#-team)
+
+---
+
+## ❗ The Problem
+
+Traditional AI/ML education treats every learner identically. A developer with two years of Python and a complete beginner get:
+
+- the **same** lecture videos and explanations,
+- the **same** math depth (either too opaque or too dumbed down),
+- the **same** practice problems and fixed linear curriculum,
+- the **same** pace.
+
+When a learner fails a fundamental concept like the *Bias–Variance Tradeoff*, most platforms just mark it wrong and move on. Gaps compound until the learner gets overwhelmed and drops out.
+
+## 💡 The Solution
+
+LearnAI turns learning into a **closed feedback loop**. It continuously estimates each learner's knowledge state per concept, detects weaknesses immediately, calibrates question difficulty, and restructures the roadmap, while an AI tutor explains every concept at the learner's exact level.
+
+> Same question, different learner, different answer.
+> Ask *"What is gradient descent?"* as a **beginner** and you get a foggy-hill analogy with 5 lines of commented Python.
+> Ask it as an **advanced** learner and you get the update rule, a Taylor-expansion derivation, and SGD/momentum/Adam trade-offs.
+
+---
+
+## 🌐 Live Demo
+
+| | Link |
+|---|---|
+| 🖥️ **Frontend (Web App)** | https://ai-tutor-mauve-kappa.vercel.app/ |
+| ⚙️ **ML Backend API** | https://learnai-ml-backend.onrender.com |
+| 📘 **Interactive API Docs** | https://learnai-ml-backend.onrender.com/docs |
+| ❤️ **Health Check** | https://learnai-ml-backend.onrender.com/health |
+
+**Demo personas** (switch from the profile switcher in the app):
+
+| Persona | Level | Goal | Profile |
+|---|---|---|---|
+| **Alex** | Beginner | Learn ML from scratch | Basic Python, weak on matrix shapes & variance |
+| **Akshat** | Intermediate | Become an ML Engineer | Strong Python, weak on bias–variance & gradient descent |
+| **Elena** | Advanced | Build GenAI apps | Senior DS, weak on vector-DB chunking & semantic drift |
+
+> ⏳ The backend runs on Render's free tier, so the first request after idle can take 30–60 seconds while it wakes up.
+
+---
+
+## ✨ Key Features
+
+### 🧠 Adaptive Intelligence (ML Backend)
+- **Learner Model**: per-concept mastery, confidence and trend tracking across 26 AI/ML concepts.
+- **Weakness Detector**: priority-scored weaknesses (HIGH / MEDIUM / LOW) with human-readable reasons and tutor alerts.
+- **Adaptive Difficulty Engine**: picks Easy / Medium / Hard from the last 5 answers, time taken and confidence, not just the score.
+- **Recommendation Engine**: builds a personalized learning path over a prerequisite DAG; skips what you know and injects revision for what you don't.
+- **Cold-Start Profiler**: turns a 6-step onboarding questionnaire into a baseline knowledge vector and a first roadmap.
+
+### 🤖 AI Tutor
+- **9 learning modes**: explanation, simplify, example, code, practice, hint, evaluate, revision, path.
+- **Level-calibrated depth**: analogies for beginners, sklearn + loss functions for intermediates, paper-level mechanics for advanced learners.
+- **Hinglish support**: replies in the learner's own language register.
+- **Verified checkpoint questions** inside explanations.
+- **Production guardrails**: prompt-injection defence, off-topic redirect, answer-leak prevention in hints, distress handling.
+
+### 📝 Adaptive Practice
+- **LLM-generated questions** targeted at detected gaps, with varied real-world scenarios.
+- **Independent answer verification**: a second model solves every question; wrong or ambiguous ones never reach the learner.
+- **"Why this question?"** explanation for every question, built from the learner's real data.
+- **Verified question pool** so practice keeps working even under AI rate limits.
+
+### 📊 Frontend Experience
+- Dashboard with a live **"Your tutor adapted your path"** banner.
+- **Skill radar** across Python, Statistics, ML, DL, NLP and GenAI.
+- **Dynamic learning path** with completed / current / adapted / locked nodes.
+- In-lesson tutor sidebar with "Explain simpler" and "Give me an example".
+- **Graceful fallback**: if the backend is unreachable, the app switches to local tutor mode instead of breaking.
+
+---
+
+## 🏗️ System Architecture
+
+```mermaid
+flowchart TB
+    subgraph FE["🖥️ React Frontend (Vercel)"]
+        UI["Pages: Dashboard · Tutor · Practice · Learning Path · Progress · Assessment"]
+        CTX["LearnerContext + API client"]
+        MOCK["Mock fallback data"]
+        UI --> CTX
+        CTX -. "on network error" .-> MOCK
+    end
+
+    CTX -- "POST /api/v1/learnai<br/>{action, learner_id, payload}" --> R
+
+    subgraph BE["⚙️ FastAPI ML Backend (Render · 512 MB)"]
+        R["Single-endpoint Action Router<br/>+ rate limiter + error envelope"]
+        LM["Learner Model"]
+        WD["Weakness Detector"]
+        AD["Adaptive Difficulty"]
+        RE["Recommendation Engine<br/>(Prerequisite DAG)"]
+        TU["Tutor Orchestrator<br/>+ Guardrails"]
+        QG["Question Generator<br/>+ Verifier + Pool"]
+        R --> LM & TU & QG & RE
+        LM --> WD --> AD --> RE
+    end
+
+    TU & QG -- "OpenAI-compatible REST" --> GQ["⚡ Groq LLMs<br/>main + fast model"]
+    LM & RE & QG & TU --> DB[("🐘 Neon Postgres<br/>learners · concept_states · attempts<br/>events · questions · chats · paths")]
+```
+
+### Design decisions
+
+| Decision | Why |
+|---|---|
+| **One endpoint, many actions** | One URL for the frontend, one error envelope, one place for rate limiting. |
+| **Rule-based engines + LLM only where it adds value** | Mastery, weakness, difficulty and path logic are deterministic, testable and instant. The LLM is used only for language: tutoring, question writing and summaries. |
+| **No local ML models** | Torch/transformers alone would blow past the 512 MB limit. The whole backend runs at ~80 MB peak. |
+| **Generator + independent verifier** | LLMs write plausible but sometimes wrong MCQs. A second model solving each question blind catches them. |
+| **Facts computed in Python, never by the LLM** | "Why this question", "next action" and learner numbers come from real data, so the tutor can't hallucinate scores. |
+| **Neon Postgres** | Render's disk is ephemeral; learner progress and the question pool must survive restarts. |
+
+---
+
+## 🔄 The Closed Learning Loop
+
+```mermaid
+flowchart LR
+    A["🤖 Tutor /<br/>📝 Questions"] --> B["👤 Learner<br/>answers"]
+    B --> C["evaluate"]
+    C --> D["📈 Mastery<br/>update"]
+    D --> E["🎯 Weakness<br/>detection"]
+    E --> F["⚖️ Difficulty<br/>adjust"]
+    F --> G["🗺️ Path<br/>update"]
+    G --> A
+```
+
+Every single answer flows through the full loop. The tutor and question generator always see the **updated** learner state on the next turn.
+
+---
+
+## 🔬 ML Intelligence Layer — Deep Dive
+
+### 1. Learner Model
+
+Each learner has a state for every concept:
+
+```json
+{
+  "concept": "bias_variance",
+  "mastery": 54.0,
+  "attempts": 8,
+  "correct": 4,
+  "recentAccuracy": 0.5,
+  "confidence": 0.72,
+  "trend": "improving"
+}
+```
+
+**Mastery update rules** (difficulty-aware and saturation-aware):
+
+| | Easy | Medium | Hard |
+|---|:---:|:---:|:---:|
+| ✅ Correct | +3 | +5 | +8 |
+| ❌ Wrong | −8 | −6 | −3 |
+
+- Gains are scaled by `(1 − mastery/100) × 1.5`, so learning slows near mastery.
+- Losses are scaled by `(mastery/100) × 1.5`, so a slip hurts more when you "should" know it.
+- Fast correct answers (< 20 s) get a +1 bonus. Mastery is clamped to 0–100.
+- **Confidence** = `min(1, attempts/10) × (1 − 0.15 × min(consecutive_wrong, 3))`
+- **Trend** compares the accuracy of the last 3 answers against the previous 3 (±0.15 threshold).
+- **Category skill score** = attempt-weighted average of concept masteries in that category.
+
+### 2. Weakness Detector
+
+Concepts are classified as **Strong (≥ 75)**, **Average (60–74)** or **Weak (< 60)**, plus a relative rule (below 75 and ≥ 15 points under the learner's own average). Untried concepts are never marked weak.
+
+**Priority score (0–100):**
 
 ```
-answer → learner model update → weakness detection → adaptive difficulty → AdaptiveEvent
+0.45 × (100 − mastery)
++ 0.20 × consecutive mistakes (capped at 3)
++ 0.15 × (100 − recent accuracy)
++ 0.10 × trend penalty (declining > stable > improving)
++ 0.10 × evidence (number of attempts)
 ```
 
-Phase 3 adds the first real LLM feature: `generate_questions`, an adaptive multiple-choice generator that runs on Groq and falls back to curated questions when the model is unavailable.
+`HIGH ≥ 55 · MEDIUM 40–54 · LOW < 40`. HIGH triggers a tutor alert:
 
-Phase 3.5 makes questions more trustworthy. An independent model checks every answer, and a pool of verified questions keeps practice working when Groq is rate limited.
+> *"Your tutor noticed you're struggling with Overfitting."*
+> 5 attempts · 40% recent accuracy · 3 consecutive mistakes · trend declining → revise **Bias vs Variance** first.
 
-Phase 4 adds `tutor_chat`, a context-aware tutor with 9 modes and layered guardrails.
+Each weakness also gets a `recommended_revision`: its weakest unmastered prerequisite from the DAG.
 
-Phase 5 adds the recommendation engine with personalized learning paths (`get_path`), cold-start profiling (`assessment`), the demo scripts, and a richer `/health`.
+### 3. Adaptive Difficulty Engine
 
-Phase 6 makes the backend deployment-ready:
+Uses the last 5 answers, their difficulty, time taken, mastery and confidence. Rules apply in order:
 
-- `/docs` doubles as the frontend integration guide, with a runnable example for every action.
-- Per-IP rate limits and a request body limit.
-- Verified on Neon Postgres, with a Render blueprint.
+| Situation | Decision |
+|---|---|
+| 2 wrong in a row at Hard | ⬇️ Medium (reinforce before retrying Hard) |
+| 2 wrong in a row at Medium | ⬇️ Easy |
+| 2+ wrong in the last 3 | ⬇️ One level down |
+| 3 correct at the same level, fast | ⬆️ One level up |
+| 3 correct at the same level | ⬆️ Up if mastery allows (≥ 60 for Medium, ≥ 75 for Hard) |
+| Correct but slow (> 1.5× expected time) | ➡️ Stay |
 
-To deploy, see **[docs/DEPLOY.md](docs/DEPLOY.md)**.
+**Example:** `Easy ✓ → Medium ✓ → Medium ✓ → Hard ✗ → Hard ✗` → next question is **Medium reinforcement**, not another Hard.
 
-`docs/SPEC.md` Section 20 is the source of truth wherever it conflicts with earlier sections of the spec.
+Every quiz produces an **AdaptiveEvent** (`reduced` / `maintained` / `increased`) using the `< 60 / 60–84 / ≥ 85` thresholds. The difficulty engine can override the raw score, and the event explains why.
 
-## Setup
+### 4. Recommendation Engine & Learning Path
 
-Requires Python 3.12 (Render uses `PYTHON_VERSION=3.12.7`).
+```mermaid
+flowchart LR
+    G["Goal → target concepts"] --> C["Prerequisite closure<br/>(DAG ancestors)"]
+    C --> S{"Per concept"}
+    S -- "mastery ≥ 75" --> SK["✅ Skip"]
+    S -- "weak" --> RV["🔁 Revision node"]
+    S -- "else" --> LN["📚 To learn"]
+    SK & RV & LN --> K["Kahn's topological sort<br/>with priority queue"]
+    K --> P["Personalized path<br/>+ daily plan + whyThisPath"]
+```
+
+**Ordering priority** among available nodes:
+1. Revision nodes (by weakness priority)
+2. Prerequisites of a weak concept (fix the foundation first)
+3. Goal relevance (shortest DAG distance to a target)
+4. Category order (Python → Stats → ML → DL → NLP → GenAI)
+
+Learners who know no programming language get Python foundations first.
+
+**Same goal, different learners, different paths:**
+
+```
+Learner A (knows Python, weak Stats)        Learner B (strong across ML)
+Python ─────────── ✓ skipped                Python ─────────── ✓
+Statistics ─────── → revision               Statistics ─────── ✓
+ML Fundamentals ── →                        ML ─────────────── ✓
+Deep Learning ──── 🔒                       Deep Learning ──── →
+                                            Generative AI ──── →
+```
+
+Every path change is snapshotted and diffed, so the dashboard can show a real **before/after**:
+
+> *Before: next up was Probability Fundamentals. After: Overfitting & Underfitting revision added.*
+
+### 5. Cold-Start Profiler
+
+The 6-step assessment (experience, languages, known topics, goal, pace, daily time) becomes a baseline mastery vector:
+
+- Known topics → 78, and their DAG ancestors at least 70 (knowing ML implies the basics).
+- Python known → Python concepts 80; no language → 15.
+- Everything else → baseline by experience (15 / 25 / 40 / 55), never above its prerequisites.
+- Then the first path, a `whyThisPath` summary and 3 diagnostic concepts are generated.
+
+---
+
+## 🛡️ LLM Pipeline & Guardrails
+
+### Question Generation Pipeline
+
+```mermaid
+flowchart LR
+    A["Concept + difficulty<br/>(from engines)"] --> B["Generator<br/>main model · T=0.5"]
+    B --> C["Schema validation"]
+    C --> D["Blind verifier<br/>fast model · T=0"]
+    D -- "pass" --> E["Shuffle options +<br/>'why this question'"]
+    D -- "fail" --> B
+    E --> F[("Verified pool")]
+    B -. "rate-limited" .-> F
+    F -. "empty" .-> G["Curated bank"]
+```
+
+- The verifier sees **only** the question and options, solves it independently, and rejects mismatches, multiple-correct options, flawed questions, low-confidence answers, and questions far from the requested difficulty.
+- Options are shuffled server-side to remove the LLM's answer-position bias.
+- Anti-repetition rotates **10 scenario domains** (healthcare, finance, autonomous vehicles…) and **6 question angles** (formula, curve diagnosis, code debugging…).
+
+### Tutor Guardrails
+
+| Layer | Protection |
+|---|---|
+| **Input** | Control-char stripping, 2000-char limit, injection / distress / off-topic detection |
+| **Prompt** | Learner message wrapped in tags and treated as data; scope limited to AI/ML learning |
+| **Off-topic** | Answered from a template **without** calling the LLM (saves quota) |
+| **Hint mode** | Rejects replies that leak or quote the correct option |
+| **Leakage** | Sentinel-phrase check against system prompt exposure |
+| **Facts** | Learner numbers only from context; no invented papers, URLs or APIs |
+| **Formatting** | KaTeX delimiter balancing; Beginner math must be explained in plain English |
+| **Wellbeing** | Distress → warm response + support line, no tutoring push |
+| **Repair** | One targeted repair call on violation, then a safe fallback |
+
+### Per-Mode Temperature
+
+| Mode | Temp | | Mode | Temp |
+|---|:---:|---|---|:---:|
+| explanation | 0.5 | | hint | 0.3 |
+| simplify | 0.6 | | evaluate | 0.1 |
+| example | 0.7 | | revision | 0.3 |
+| code | 0.2 | | path | 0.3 |
+| practice | 0.4 | | verifier | 0.0 |
+
+Prompts are versioned templates (`app/prompts/`) composed as **Role → Guardrails → Learner context → Level rules → Mode rules → Output schema**.
+
+---
+
+## 📡 API Reference
+
+Everything goes through **one endpoint**:
+
+```http
+POST /api/v1/learnai
+Content-Type: application/json
+```
+
+```json
+{
+  "action": "tutor_chat",
+  "learner_id": "akshat-intermediate",
+  "payload": { "message": "Why does my model overfit?" }
+}
+```
+
+Every response uses the same envelope:
+
+```json
+{
+  "success": true,
+  "action": "tutor_chat",
+  "data": { "...": "..." },
+  "error": null,
+  "fallback_data": null
+}
+```
+
+| Action | Purpose | LLM |
+|---|---|:---:|
+| `get_profile` | Learner profile, skills, weakness report, recent adaptive events | ❌ |
+| `reset_learner` | Restore a demo learner to its seeded state | ❌ |
+| `evaluate` | Grade one answer or a whole quiz → full adaptive loop | ❌ |
+| `generate_questions` | Personalized, verified MCQs with "why this question" | ✅ |
+| `tutor_chat` | AI tutor with 9 modes, checkpoint questions, follow-ups | ✅ |
+| `get_path` | Personalized roadmap, daily plan, before/after changes | Summary only |
+| `assessment` | Cold-start onboarding for a new learner | Summary only |
+
+Other routes: `GET /health` · `GET /docs` (Swagger with a working example for every action) · `GET /redoc`.
+
+> ✅ Always check `success`, not the HTTP status. Action errors return HTTP 200 with `success: false` and a typed error code (`RATE_LIMITED`, `LEARNER_NOT_FOUND`, `UNKNOWN_CONCEPT`, …).
+
+<details>
+<summary><b>Example: evaluate a quiz</b></summary>
+
+```json
+{
+  "action": "evaluate",
+  "learner_id": "akshat-intermediate",
+  "payload": {
+    "quiz": true,
+    "topic": "Bias vs Variance",
+    "category": "Machine Learning",
+    "answers": [
+      {
+        "question_id": "seed-q-bias-variance",
+        "concept_tested": "Bias vs Variance",
+        "category": "Machine Learning",
+        "difficulty": "Medium",
+        "selected_option_index": 0,
+        "time_taken_seconds": 38
+      }
+    ]
+  }
+}
+```
+
+Returns mastery updates, the weakness report, the next difficulty with its reason, and an `AdaptiveEvent` with the real roadmap change.
+</details>
+
+<details>
+<summary><b>Example: generate adaptive questions</b></summary>
+
+```json
+{
+  "action": "generate_questions",
+  "learner_id": "alex-beginner",
+  "payload": { "difficulty": "Adaptive", "count": 3 }
+}
+```
+
+The engine picks the concept (top weakness) and difficulty automatically.
+</details>
+
+---
+
+## 🧰 Tech Stack
+
+| Layer | Technology |
+|---|---|
+| **Frontend** | React 18, TypeScript, Vite, Tailwind CSS, Markdown + KaTeX rendering |
+| **Backend** | FastAPI, Uvicorn, Pydantic v2, SQLAlchemy 2.x |
+| **LLM** | Groq (OpenAI-compatible REST via `httpx`): main model for tutoring/generation, fast model for verification and summaries |
+| **Database** | Neon Serverless Postgres (psycopg 3, pooler endpoint) · SQLite for local dev |
+| **Algorithms** | Rule-based knowledge tracing, priority scoring, Kahn's topological sort over a concept DAG |
+| **Hosting** | Vercel (frontend) · Render free tier, Singapore (backend) |
+| **Testing** | Python `unittest` (237 tests), LLM-as-judge eval script |
+
+**Deliberately not used:** torch, transformers, sklearn, pandas, numpy, LangChain, vector DBs. The backend fits comfortably in 512 MB RAM.
+
+---
+
+## 📁 Project Structure
+
+### Backend (`learnai_ml_backend`)
+
+```
+├── app/
+│   ├── main.py               # FastAPI app, lifespan, CORS, docs, error handlers
+│   ├── router.py             # Single endpoint + action dispatcher + rate limiter
+│   ├── config.py · db.py · models.py · schemas.py · seed.py
+│   ├── actions/              # profile, evaluate, questions, tutor, path, assessment
+│   ├── engine/
+│   │   ├── concepts.py       # 26-concept catalog + prerequisite DAG + aliases
+│   │   ├── learner_model.py  # Mastery, confidence, trend, profile view
+│   │   ├── weakness.py       # Classification + priority scoring
+│   │   ├── difficulty.py     # Adaptive difficulty rules
+│   │   ├── adaptation.py     # AdaptiveEvent generation
+│   │   ├── recommender.py    # Path algorithm + diff
+│   │   ├── goals.py · cold_start.py
+│   │   └── tutor_modes.py · tutor_context.py · tutor_guardrails.py
+│   ├── llm/
+│   │   ├── groq_client.py    # Shared async client, retries, error mapping
+│   │   └── verifier.py       # Blind question verifier
+│   ├── prompts/              # Versioned prompt templates
+│   └── data/fallback_questions.json
+├── scripts/                  # smoke_generate · eval_tutor · demo_flow · warm_pool
+├── tests/                    # 237 unit + integration tests
+├── docs/SPEC.md              # Full spec + implementation addendum
+├── render.yaml
+└── requirements.txt
+```
+
+### Frontend
+
+```
+client/src/
+├── pages/        # Home, Dashboard, Tutor, Practice, Learn, LearningPath, Progress, Assessment
+├── contexts/     # LearnerContext (state + adaptive events)
+├── services/     # api.ts — typed client for the single endpoint, with fallback
+└── data/         # Mock learners, questions, tutor replies, path (offline fallback)
+```
+
+---
+
+## 🚀 Getting Started
+
+### Backend
 
 ```bash
+git clone https://github.com/Harsh28-raj/learnai_ml_backend.git
+cd learnai_ml_backend
+
 python -m venv .venv
-# Windows (PowerShell):  .venv\Scripts\Activate.ps1
-# macOS/Linux:           source .venv/bin/activate
+# Windows: .venv\Scripts\activate   |   macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env        # then fill in GROQ_API_KEY (optional in Phase 1)
+
+cp .env.example .env          # add your GROQ_API_KEY (DATABASE_URL defaults to SQLite)
+
+uvicorn app.main:app --reload
+# → http://127.0.0.1:8000/docs
 ```
 
-| Variable | Default | Notes |
-|---|---|---|
-| `DATABASE_URL` | `sqlite:///./learnai.db` | `postgres://` / `postgresql://` URLs (Neon, Supabase) are rewritten to `postgresql+psycopg://` automatically |
-| `GROQ_API_KEY` | empty | The app starts without it; LLM calls will raise `LLM_NOT_CONFIGURED` |
-| `GROQ_MODEL_MAIN` / `GROQ_MODEL_FAST` | `openai/gpt-oss-120b` / `openai/gpt-oss-20b` | `generate_questions` uses the main model |
-| `GROQ_REASONING_EFFORT` | `low` | Sent only when set. If Groq rejects it, the request is retried without it |
-| `VERIFY_QUESTIONS` | `true` | Every generated question is checked by `GROQ_MODEL_FAST` before it is served |
-| `TUTOR_SUPPORT_TEXT` | Tele-MANAS line | Support line the tutor adds when a learner seems distressed |
-| `ALLOWED_ORIGINS` | `http://localhost:5173,http://localhost:8080` | Comma-separated CORS origins, or `*` for any origin (no credentials) |
-| `ENABLE_DOCS` | `true` | Serves `/docs` (Swagger UI, which is also the integration guide), `/redoc` and `/openapi.json` |
-| `RATE_LIMIT_LLM_PER_MIN` / `RATE_LIMIT_OTHER_PER_MIN` | `20` / `120` | Per-IP limits per minute for AI actions / other actions. `0` disables |
-
-## Run locally
-
-```bash
-uvicorn app.main:app --reload --port 8000
-```
-
-On startup the app checks that the concept DAG is valid and creates the tables. If the database has no learners, it seeds the three demo learners.
-
-## Run tests
-
-To run the same suite on the Postgres in `.env`, inside a throwaway schema that is dropped afterwards: `LEARNAI_TEST_PG=1 python -m unittest discover -s tests`.
-
-Tests use stdlib `unittest` and never call the network: the LLM is mocked, and the Groq client is tested through `httpx.MockTransport`. The integration tests use FastAPI's `TestClient` against a throwaway SQLite file, so your local `learnai.db` is never touched:
+Run the tests:
 
 ```bash
 python -m unittest discover -s tests -v
 ```
 
-## API
-
-The service exposes only two routes (plus `/docs` and `/openapi.json` when `ENABLE_DOCS=true`):
-
-- `GET /health` returns `{"status": "ok", "db": "ok", "llm_configured": true, "pool_size": 42}`. It never calls the LLM.
-- `POST /api/v1/learnai` handles every action
-
-### Request / response contract
-
-```jsonc
-// Request
-{ "action": "get_profile", "learner_id": "akshat-intermediate", "payload": {} }
-
-// Response (always this shape, including on errors)
-{
-  "success": true,
-  "action": "get_profile",
-  "data": { ... } | null,
-  "error": { "code": "...", "message": "...", "details": ... } | null,
-  "fallback_data": { ... } | null
-}
-```
-
-| Action | Status |
-|---|---|
-| `get_profile` | Working. Returns `data.profile` (the `LearnerProfile` from SPEC §5 in camelCase, plus `conceptStates` and `recentAdaptiveEvents`) and `data.weakness_report` |
-| `reset_learner` | Working. Clears the demo learner's attempts and adaptive events, re-seeds its concept states, and returns the same data as `get_profile` |
-| `evaluate` | Working. Grades one answer or a whole quiz and runs the closed loop. See below |
-| `generate_questions` | Working. Adaptive MCQs from Groq, with a curated fallback. See below |
-| `tutor_chat` | Working. The AI tutor; see below |
-| `get_path` | Working. Personalized learning path; see below |
-| `assessment` | Working. Cold-start profile from the onboarding questionnaire; see below |
-
-`get_profile`, `reset_learner` and `evaluate` accept an optional `payload.utc_offset_minutes` (for example `330` for IST). It is used to format human-readable timestamps such as "Today at 2:15 PM". Every event also carries an ISO `createdAt`, so the frontend can format times itself if it prefers.
-
-### `evaluate`
-
-There are two payload shapes.
-
-**Single answer:**
-
-```json
-{
-  "question_id": "ml-q1",
-  "concept_tested": "Bias vs Variance",
-  "category": "Machine Learning",
-  "difficulty": "Medium",
-  "selected_option_index": 0,
-  "time_taken_seconds": 38,
-  "correct_index": 1
-}
-```
-
-`correct_index` and `is_correct` are optional; see the grading order below.
-
-**Whole quiz** (matches the frontend's `recordQuizScore`):
-
-```json
-{ "quiz": true, "topic": "Bias vs Variance", "category": "Machine Learning", "answers": [ /* single-answer objects */ ] }
-```
-
-Inside a quiz, an answer without `concept_tested` falls back to the quiz `topic`. A quiz takes at most 50 answers.
-
-`concept_tested` can be a concept id, a name, an alias or free text. For example, "Bias vs Variance", "bias-variance tradeoff" and "bias_variance" all resolve to the same concept. If nothing matches, the response is `UNKNOWN_CONCEPT`, with the closest suggestions in `error.details.suggestions`.
-
-**Grading order for each answer:**
-
-1. If `question_id` is in the `questions` table, the server grades it with the stored `correct_index`, concept and difficulty, and ignores the payload's values.
-2. Otherwise, if the payload has `correct_index` and `selected_option_index`, they are compared.
-3. Otherwise, the payload's `is_correct` is used.
-4. If none of these is available, the response is `CANNOT_GRADE`.
-
-Client-side grading is allowed because the frontend's mock questions are not in the database.
-
-**What happens on each call.** All of this runs in one database transaction, so a failing answer in a quiz writes nothing:
-
-- Each answer is inserted into `attempts` and updates that concept's state through the learner model.
-- `questionsSolved` goes up by the number of answers.
-- `accuracyRate` uses the SPEC §8.3 cumulative formula. It is stored to one decimal place so rounding errors don't accumulate.
-- Category scores are recomputed from concept states. The old exponential-moving-average formula from SPEC §8.3 is no longer used.
-- An `AdaptiveEvent` is saved.
-
-**Response `data`:**
-
-```jsonc
-{
-  "results": [{ "question_id", "is_correct", "correct_index", "concept" }],
-  "score": 0,                          // % correct in this request
-  "mastery_updates": [{ "concept", "concept_name", "previous_score", "new_score", "category",
-                        "previous_category_score", "new_category_score", "trend", "confidence" }],
-  "weakness_report": { "strong": [], "average": [], "weak": [], "untried": [] },
-  "next_difficulty": { "concept", "difficulty", "reason", "rule_id" },
-  "adaptive_decision": { "id", "timestamp", "createdAt", "topic", "score", "action", "reason",
-                         "recommendation", "pathAdjustment", "concept", "overridden", "thresholdAction" }
-}
-```
-
-`adaptive_decision` follows the SPEC §8.2 `AdaptiveEvent` shape, with a few extra fields.
-
-In quiz mode, `next_difficulty` and `adaptive_decision` are based on the quiz `topic` if it was answered. Otherwise they use the concept answered most often.
-
-| Error code | When |
-|---|---|
-| `UNKNOWN_ACTION` | `action` is not in the registry |
-| `LEARNER_NOT_FOUND` | No learner has this `learner_id` (for `reset_learner`, the id is not a demo learner) |
-| `NOT_IMPLEMENTED` | The action is registered but not built yet |
-| `UNKNOWN_CONCEPT` | `concept_tested` or the quiz topic does not match any concept. `details.suggestions` lists the 3 closest |
-| `CANNOT_GRADE` | There is not enough information to grade an answer (see the grading order above) |
-| `LLM_NOT_CONFIGURED`, `MODEL_RATE_LIMIT`, `MODEL_TIMEOUT`, `MODEL_ERROR`, `GENERATION_FAILED` | Question generation failed. `fallback_data` carries curated questions |
-| `EMPTY_MESSAGE`, `MESSAGE_TOO_LONG`, `QUESTION_NOT_FOUND` | `tutor_chat` input problems |
-| `VERIFICATION_SHORTFALL` | Notice: too few generated questions passed verification, so the pool or bank filled the gap |
-| `LEARNER_EXISTS`, `DEMO_LEARNER_PROTECTED`, `NOT_A_DEMO_LEARNER` | `assessment` and `reset_learner` ownership rules |
-| `RATE_LIMITED` | Too many requests from this IP. Wait `details.retry_after_seconds` |
-| `PAYLOAD_TOO_LARGE` (HTTP 413) | Request body over 32 KB |
-| `INVALID_PAYLOAD` | `payload` has the wrong shape, for example a missing or invalid `difficulty` or an empty quiz. `details` lists the problems; in quiz mode it includes `answer_index` |
-| `INVALID_REQUEST` | The body does not match the contract (HTTP 422) |
-| `INTERNAL_ERROR` | An unexpected exception. The server never returns a raw 500 body |
-
-Business errors (everything except `INVALID_REQUEST` and `INTERNAL_ERROR`) return HTTP 200 with `success: false`.
-
-### `generate_questions`
-
-```json
-{ "category": "Machine Learning", "target_concept": "Bias vs Variance", "difficulty": "Adaptive", "count": 3 }
-```
-
-Every field is optional:
-
-- **`category`:** one of the 6 skill categories. The frontend's "Computer Vision" and "LLMs" are mapped onto them.
-- **`difficulty`:** `Adaptive` (the default), `Easy`, `Medium` or `Hard`.
-- **`count`:** 1–5, default 3.
-
-Python picks the concept and difficulty, assigns a scenario domain and question angle to each question, validates and shuffles the options, and writes `whyThisQuestion`. The LLM only writes the question content.
-
-Generated questions are saved server-side. When you grade them with `evaluate`, send `question_id` and `selected_option_index`; the server uses its stored answer.
-
-**Response `data`:**
-
-```jsonc
-{
-  "count": 3, "requested_count": 3,
-  "concept": "bias_variance", "concept_name": "Bias vs Variance Tradeoff", "selection_reason": "weak",
-  "difficulty": "Medium", "difficulty_reason": "...",
-  "questions": [{
-    "id": "gen-1d0e6051e6", "category": "Machine Learning", "difficulty": "Medium",
-    "conceptId": "bias_variance", "conceptTested": "Bias vs Variance Tradeoff",
-    "title": "...", "question": "...", "codeSnippet": null, "options": ["...", "...", "...", "..."],
-    "correctIndex": 1, "explanation": "...", "hint": "...",
-    "whyThisQuestion": "Generated because you scored 54% on Bias vs Variance Tradeoff.",
-    "recommendedNextDifficulty": "Medium", "scenarioDomain": "e-commerce", "questionAngle": "curve_or_metric_diagnosis"
-  }],
-  "generation": { "model": "...", "llm_calls": 1, "rejected": 0, "latency_ms": 2400, "validation_errors": [] }
-}
-```
-
-`count` can be lower than `requested_count` when some questions still fail validation after the one repair retry.
-
-**Correctness and resilience (Phase 3.5).**
-
-- **Verification:** a second model solves every generated question without seeing the answer. A question is rejected if that model picks a different answer, finds two defensible answers, flags a flaw, or has low confidence. Rejected questions are regenerated once. Unverified questions are never served.
-- **When Groq can't deliver:** if Groq is rate limited, times out, or too few questions pass verification, the gap is filled from the **verified pool**, then from the curated bank.
-  - The pool holds earlier verified questions at the same level that this learner hasn't seen.
-  - Each question carries a `source` field: `llm`, `pool` or `fallback`.
-  - The response stays `success: true` as long as the requested count was met. `error` then carries a notice explaining where the questions came from.
-
-**When generation fails.** If the LLM is unavailable (`LLM_NOT_CONFIGURED`, `MODEL_RATE_LIMIT`, `MODEL_TIMEOUT` or `MODEL_ERROR`), or no question passes validation (`GENERATION_FAILED`), the response has `success: false`. `fallback_data.questions` then holds curated questions in the same shape, with `"fallback": true`. They are saved too, so `evaluate` can grade them.
-
-**Live smoke test.** This is manual and calls the real Groq API through a running server:
+### Frontend
 
 ```bash
-uvicorn app.main:app --port 8000
-python scripts/smoke_generate.py --base http://127.0.0.1:8000 --count 2 --gap 30   # gap: Groq free tier tokens/minute
+cd client
+npm install
+echo "VITE_ML_API_URL=http://127.0.0.1:8000" > .env
+npm run dev
+# → http://localhost:5173
 ```
 
-### `tutor_chat`
+---
 
-```json
-{ "message": "Why does my model overfit?", "conversation_id": "conv-…", "mode": "explanation",
-  "current_topic": "Overfitting", "question_id": "gen-…", "student_answer": "…", "record": true }
-```
+## 🔐 Environment Variables
 
-- **`message`** is required: 1–2000 characters.
-- **`conversation_id`** is optional. When it is missing, the server creates one and returns it as `conversationId`. Send it back to keep the conversation going.
-- **`mode`** is optional. When it is missing, the mode is detected from the message.
-  - The 9 modes are explanation, simplify, example, code, practice, hint, evaluate, revision and path.
-  - Detection understands some Hinglish, such as "samajh nahi aaya" or "aage kya".
-- **Hint mode** needs `question_id`.
-- **Evaluate mode** needs `student_answer`. By default it records the result as a practice attempt; send `record: false` to skip that.
-
-**Response `data`** (camelCase):
-
-```jsonc
-{
-  "conversationId": "conv-…", "message": "markdown + KaTeX", "mode": "explanation", "modeSource": "auto",
-  "concept": "overfitting", "conceptName": "Overfitting & Underfitting", "difficultyLevel": "Intermediate",
-  "followUpSuggestions": ["…", "…", "…"],
-  "checkpointQuestion": { "id": "chk-…", "question": "…", "options": ["…"], "correctIndex": 1, "explanation": "…", "hint": "…", "verified": true } | null,
-  "recommendedNextAction": { "type": "practice|revise|advance|continue", "targetTopic": "…", "reason": "…" },
-  "evaluation": { "score": 45, "correctPoints": [], "misconceptions": [], "correctedAnswer": "…", "recorded": true } | null,
-  "masteryUpdate": { … } | null, "adaptiveDecision": { … } | null,
-  "promptVersion": "tutor-v1",
-  "guardrails": { "injectionAttempt": false, "distress": false, "offTopic": false, "violations": [], "fixes": [],
-                  "repaired": false, "fallbackUsed": false, "checkpoint": "verified" },
-  "generation": { "model": "…", "llmCalls": 1, "verifyCalls": 1, "latencyMs": 2900 }
-}
-```
-
-- **Checkpoint questions** are independently verified and saved on the server. Grade them with `evaluate` using `question_id` and `selected_option_index`.
-- **When the LLM is unavailable:** `success: false`, and `fallback_data` holds `{conversation_id, reply, follow_ups}`. Show that reply instead of an error. The learner's message is still saved.
-
-**Guardrails.**
-
-- **Scope:** the tutor stays on AI/ML topics. Off-topic messages get a template reply without calling the LLM.
-- **Safety:** it refuses to reveal its prompt, and it detects distress and adds a support line.
-- **Hints** never reveal the answer.
-- **Links** are kept only for python, scikit-learn, pytorch, numpy and pandas documentation.
-- **Length** is capped per level and per mode.
-- **No duplicates:** checkpoint and follow-up text duplicated inside `message` is removed.
-- **Hinglish** input gets a Hinglish reply.
-- **Beginners** only see math that is explained in plain English.
-
-Leaks and invalid output trigger one repair call, then a safe fallback reply.
-
-**Prompts** live in `app/prompts/*.txt` and are versioned (`tutor-v1`, `qgen-v2`).
-
-**Live tutor evaluation** is manual and calls the real Groq API: 13 scripted cases, scored by a temperature-0 judge model.
-
-```bash
-python scripts/eval_tutor.py --base http://127.0.0.1:8000 --gap 3
-```
-
-### `get_path`
-
-The payload is `{}`. Send `{"goal": "GenAI Apps"}` to preview a different goal; a preview is computed but not saved.
-
-The path covers the goal's target concepts and all their prerequisites, ordered by topological sort with these priorities:
-
-1. weak concepts you've practiced, inserted as revision nodes
-2. the foundations under those weak concepts
-3. closeness to the goal
-4. category
-
-Concepts you already know (mastery 75 or above) are marked `completed`, with `skipped: true` if you never practiced them.
-
-```jsonc
-{
-  "goal": "ML Engineer", "goalLabel": "become an ML Engineer", "targets": ["…"],
-  "nodes": [{ "id": "node-bias-variance", "conceptId": "bias_variance", "title": "Bias vs Variance Tradeoff",
-              "category": "Machine Learning", "status": "completed|current|recommended|adapted|locked",
-              "progress": 54, "mastery": 54, "estimatedMinutes": 23, "reason": "Revision added: …",
-              "isRevision": true, "skipped": false, "prerequisites": ["…"], "foundationFor": null, "order": 10 }],
-  "milestones": [{ "id": "stage-machine-learning", "title": "Machine Learning", "status": "current", "nodeIds": [], "progress": 70 }],
-  "currentNode": { … }, "nextNodes": [ … ],
-  "changes": [{ "type": "inserted_revision|skipped|completed|unlocked|reordered", "conceptId": "…", "title": "…", "detail": "…" }],
-  "changedNow": false, "beforeAfter": "Before: next up was X. After: Y revision added; current focus is Z.",
-  "whyThisPath": "…", "whySource": "llm|template",
-  "estimatedWeeksRemaining": 2, "totalEstimatedMinutes": 249,
-  "dailyPlan": [{ "id": "plan-practice-…", "title": "…", "type": "revision|practice|lesson", "durationMinutes": 15, "completed": false, "conceptId": "…" }]
-}
-```
-
-- **Dashboard:** `beforeAfter` is the line for the dashboard's "Your tutor adapted your path" banner.
-- **After `evaluate`:** every evaluate call recomputes the path. The AdaptiveEvent's `pathAdjustment` then describes the real change, or says "Roadmap unchanged: …".
-- **Caching:** `whyThisPath` is cached until the path changes, so repeated `get_path` calls are fast and make no LLM call.
-
-### `assessment`
-
-```json
-{ "name": "Riya", "experience_level": "Beginner|Some Programming|Intermediate|Advanced",
-  "languages": ["Python"], "topics_known": ["NumPy", "Statistics"], "goal": "ML Engineer",
-  "pace": "Relaxed|Balanced|Intensive", "daily_minutes": 30, "overwrite": false }
-```
-
-- **New learners:** a new `learner_id` creates a learner.
-- **Existing learners:** need `overwrite: true` to redo the assessment.
-- **Protected ids:** demo and pool learners can't be assessed.
-- **Baselines:** the learner's level and every concept's starting mastery are computed from the answers in Python, with no LLM call.
-- **Response:** `{profile, weakness_report, path, level, goal, firstStep}`. `firstStep` suggests a 3-concept diagnostic.
-- **Resetting an assessed learner:** use `assessment` with `overwrite: true`; `reset_learner` is only for the 3 demo learners.
-
-**Demo helpers** (manual, live):
-
-```bash
-python scripts/demo_flow.py --base http://127.0.0.1:8000 --gap 20        # SPEC §11 loop for akshat, then reset
-python scripts/warm_pool.py --only-demo --dry-run                         # how big a pool warm-up would be
-python scripts/warm_pool.py --only-demo --per-cell 2 --gap 25             # pre-generate verified questions (resumable)
-```
-
-### curl examples
-
-```bash
-# Health
-curl http://localhost:8000/health
-
-# get_profile for each demo learner
-curl -s -X POST http://localhost:8000/api/v1/learnai -H "Content-Type: application/json" \
-  -d '{"action":"get_profile","learner_id":"alex-beginner"}'
-curl -s -X POST http://localhost:8000/api/v1/learnai -H "Content-Type: application/json" \
-  -d '{"action":"get_profile","learner_id":"akshat-intermediate"}'
-curl -s -X POST http://localhost:8000/api/v1/learnai -H "Content-Type: application/json" \
-  -d '{"action":"get_profile","learner_id":"elena-advanced"}'
-
-# reset_learner for each demo learner
-curl -s -X POST http://localhost:8000/api/v1/learnai -H "Content-Type: application/json" \
-  -d '{"action":"reset_learner","learner_id":"alex-beginner"}'
-curl -s -X POST http://localhost:8000/api/v1/learnai -H "Content-Type: application/json" \
-  -d '{"action":"reset_learner","learner_id":"akshat-intermediate"}'
-curl -s -X POST http://localhost:8000/api/v1/learnai -H "Content-Type: application/json" \
-  -d '{"action":"reset_learner","learner_id":"elena-advanced"}'
-```
-
-```bash
-# evaluate: a wrong Medium answer on Bias vs Variance
-curl -s -X POST http://localhost:8000/api/v1/learnai -H "Content-Type: application/json" \
-  -d '{"action":"evaluate","learner_id":"akshat-intermediate","payload":{"question_id":"ml-q1","concept_tested":"Bias vs Variance","category":"Machine Learning","difficulty":"Medium","selected_option_index":0,"correct_index":1,"time_taken_seconds":38}}'
-
-# evaluate: quiz mode
-curl -s -X POST http://localhost:8000/api/v1/learnai -H "Content-Type: application/json" \
-  -d '{"action":"evaluate","learner_id":"akshat-intermediate","payload":{"quiz":true,"topic":"Bias vs Variance","category":"Machine Learning","answers":[{"concept_tested":"Bias vs Variance","difficulty":"Easy","selected_option_index":1,"correct_index":1,"time_taken_seconds":15},{"concept_tested":"Overfitting","difficulty":"Medium","is_correct":false,"time_taken_seconds":50}]}}'
-```
-
-On Windows PowerShell, use `curl.exe` and escape the inner quotes. Alternatively, use `Invoke-RestMethod`:
-
-```powershell
-Invoke-RestMethod -Method Post -Uri http://localhost:8000/api/v1/learnai -ContentType 'application/json' `
-  -Body '{"action":"get_profile","learner_id":"akshat-intermediate"}'
-```
-
-## Note for the frontend team: single-endpoint design
-
-Every ML feature goes through `POST /api/v1/learnai`, with a different `action` for each feature. This replaces the separate endpoints sketched in SPEC §12. The frontend needs one small client function:
-
-```ts
-async function learnai(action: string, learnerId: string, payload = {}) {
-  const res = await fetch(`${API}/api/v1/learnai`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action, learner_id: learnerId, payload }),
-  });
-  const body = await res.json();
-  if (!body.success) throw Object.assign(new Error(body.error?.message), body);
-  return body.data;
-}
-```
-
-- Check the `success` field, not the HTTP status.
-- When `success` is false, `fallback_data` may hold something worth rendering. If it is null, use the local mocks as SPEC §13.2 describes.
-- New actions in later phases do not change the URL or the response shape.
-- Demo learner ids map to the frontend personas: `beginner` → `alex-beginner`, `intermediate` → `akshat-intermediate`, `advanced` → `elena-advanced`.
-
-## Learner model, in brief
-
-The model lives in `app/engine/learner_model.py` and is made of pure functions, with no database access.
-
-- **Mastery** is tracked per concept on a 0–100 scale. A correct answer adds Easy +3, Medium +5 or Hard +8, multiplied by `(1 − m/100)·1.5`. The minimum gain is +1, and an answer under 20 s earns +1 more. A wrong answer subtracts Easy −8, Medium −6 or Hard −3, multiplied by `(m/100)·1.5`. The minimum loss is −1.
-- **Confidence** is `min(1, attempts/10) · (1 − 0.15·min(consecutive_wrong, 3))`.
-- **Trend** compares accuracy on the last 3 results with the 3 before them. A difference above ±0.15 counts as improving or declining. With fewer than 4 results, the trend is stable.
-- **Skills** are the attempt-weighted average mastery for each category. Concepts with no attempts count with weight 1.
-- **Strengths** are practiced concepts at 75 or above.
-- **Weaknesses** are practiced concepts below 65. A practiced concept below 75 also counts when it sits at least 15 points under the learner's own average. This relative rule keeps advanced learners from having no weaknesses: Elena's RAG chunking score of 68% (SPEC §6.3) is caught by it. Concepts with no attempts are never weaknesses. This is the `profile.weaknesses` list that the frontend's `LearnerProfile` expects.
-
-### Weakness detector (`app/engine/weakness.py`)
-
-This module produces `weakness_report`, which is separate from `profile.weaknesses`.
-
-- **Classes:** Strong is 75 or above, Average is 60–74, and Weak is below 60. The relative rule above also applies here, and untried concepts are listed under `untried`.
-  - Because of the different thresholds, Akshat's Gradient Descent (61) and ROC-AUC (63) count as Average in this report, while they still appear in `profile.weaknesses`, which uses the SPEC's 65 cut-off.
-- **Priority:** a score from 0 to 100, computed as `0.45·(100−mastery) + 0.20·wrong-streak + 0.15·(100−recent accuracy) + 0.10·trend + 0.10·evidence`. HIGH is 55 or above, MEDIUM is 40–54 and LOW is below 40.
-  - Only HIGH entries get a `tutor_alert`.
-- **`recommended_revision`:** found by walking the concept's prerequisites one layer at a time, starting with its direct prerequisites. Within the closest layer that has a gap (mastery below 60), it picks the weakest concept. If no prerequisite has a gap, it recommends the concept itself.
-
-### Adaptive difficulty (`app/engine/difficulty.py`)
-
-The rules run in order and the first match wins. They look only at the last 5 results.
-
-| Rule | Condition | Next difficulty |
+| Variable | Description | Default |
 |---|---|---|
-| R0 | No attempts yet | Easy if mastery is below 50, Medium if below 75, otherwise Hard |
-| R1 | Last two answers wrong at Hard | Medium |
-| R2 | Last two answers wrong at Medium | Easy |
-| R3 | 2 or more of the last 3 wrong | One level down |
-| R4 | Last 3 correct at the same level, with average time under 60% of expected (Easy 30 s, Medium 60 s, Hard 120 s) | One level up |
-| R5 | Last 3 correct at the same level | Up only if mastery is at least 60 (Easy → Medium) or 75 (Medium → Hard); otherwise stay |
-| R6 | Last answer correct but slower than 1.5× expected | Stay |
-| R7 | Anything else | Stay |
+| `DATABASE_URL` | Postgres URL (Neon) or SQLite | `sqlite:///./learnai.db` |
+| `GROQ_API_KEY` | Groq API key | — |
+| `GROQ_MODEL_MAIN` | Tutor + question generation model | `openai/gpt-oss-120b` |
+| `GROQ_MODEL_FAST` | Verifier + summaries | `openai/gpt-oss-20b` |
+| `GROQ_REASONING_EFFORT` | Reasoning effort for supported models | `low` |
+| `VERIFY_QUESTIONS` | Enable the blind verifier | `true` |
+| `ALLOWED_ORIGINS` | CORS origins (comma-separated or `*`) | localhost |
+| `ENABLE_DOCS` | Serve `/docs` and `/redoc` | `true` |
+| `RATE_LIMIT_LLM_PER_MIN` | Per-IP limit for AI actions | `20` |
+| `RATE_LIMIT_OTHER_PER_MIN` | Per-IP limit for other actions | `120` |
+| `TUTOR_SUPPORT_TEXT` | Support line shown on distress | Tele-MANAS (India) |
 
-### Adaptive event (`app/engine/adaptation.py`)
+Frontend: `VITE_ML_API_URL` only. **No secrets ever live in the frontend.**
 
-- **Action from the score** (SPEC thresholds): below 60 is `reduced`, 60–84 is `maintained`, and 85 or above is `increased`.
-- **Override:** if the difficulty engine disagrees, its decision wins and the `reason` explains why. For example, a 100% score with slow answers becomes `maintained`.
-- **No override at the edges:** a learner who scores 0% while already at Easy stays `reduced`, because the engine cannot step lower. The same applies to `increased` at Hard.
-- **`pathAdjustment`** describes the intended roadmap change, such as an injected prerequisite revision or an early unlock. The path engine that applies these changes comes in Phase 5.
+---
 
-## Deploy (Render)
+## ☁️ Deployment
 
-`render.yaml` defines a free Python web service with one uvicorn worker and a health check on `/health`. Set `DATABASE_URL` (Neon or Supabase Postgres), `GROQ_API_KEY` and `ALLOWED_ORIGINS` in the Render dashboard. The free-tier disk is ephemeral, so use Postgres in production; SQLite data is lost on every redeploy.
+| Component | Platform | Notes |
+|---|---|---|
+| Frontend | **Vercel** | `VITE_ML_API_URL` points to the Render backend |
+| Backend | **Render** (free, Singapore) | `uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1` |
+| Database | **Neon Postgres** (Singapore) | Pooler endpoint, prepared statements disabled |
+| Uptime | **UptimeRobot** | Pings `/health` to reduce cold starts |
+
+Before a live demo, `scripts/warm_pool.py --only-demo` pre-fills the verified question pool so practice is instant even under AI rate limits.
+
+---
+
+## 🧪 Testing & Evaluation
+
+**237 tests passing** on both SQLite and Neon Postgres. The LLM is always mocked in tests, so no test touches the network.
+
+Coverage includes mastery math, every difficulty rule, weakness priority, path ordering, path diffs, cold start, every guardrail, verifier rejection paths, the pool fallback chain, rate limiting, and the full SPEC loop over HTTP.
+
+### Tutor Quality (LLM-as-judge, 13 scenarios)
+
+| Metric | Score |
+|---|:---:|
+| Level fit | 4.38 / 5 |
+| **Correctness** | **5.00 / 5** |
+| Guardrail adherence | 4.77 / 5 |
+| Helpfulness | 4.62 / 5 |
+| **Overall** | **4.69 / 5** |
+
+Scenarios include beginner vs advanced on the same question, Hinglish, hint without leakage, open-answer grading, prompt injection, off-topic, and a distress message.
+
+---
+
+## ⚡ Performance
+
+| Metric | Value |
+|---|---|
+| Memory (Render) | ~64 MB private, ~82 MB peak (limit 512 MB) |
+| `get_profile` / `evaluate` | 0.2–1 s |
+| `get_path` (cached) | ~5 ms server-side |
+| Tutor reply | ~1.2 s (explanation) – 3.5 s (code) |
+| Verified question batch | ~3–8 s (generate + verify) |
+| `/health` | < 300 ms |
+
+---
+
+## 🎬 Demo Walkthrough
+
+1. **Switch personas.** Ask *"What is gradient descent?"* as Alex, then as Elena. Compare the depth.
+2. **As Akshat**, ask *"Why does my model overfit?"*, then click **Explain simpler**.
+3. **Practice** Bias vs Variance and answer one question wrong.
+4. Watch the **dashboard banner**: mastery drops, difficulty goes to Easy, a revision node is injected, and the tutor alert fires.
+5. Answer 3 Easy questions correctly. Mastery climbs, the trend turns *improving*, and difficulty steps back up.
+6. Open the **Learning Path** to see the before/after change and *why this path*.
+7. Go offline in DevTools. The app keeps working in **local tutor mode**.
+
+---
+
+## 🗺️ Roadmap
+
+- [ ] True Bayesian Knowledge Tracing (BKT) / IRT on top of the rule-based model
+- [ ] Streaming tutor responses (SSE)
+- [ ] RAG over curated course material with API-based embeddings
+- [ ] Code-debugging and scenario question types in the UI
+- [ ] User authentication and per-user persistence
+- [ ] Spaced-repetition scheduling for revision nodes
+- [ ] Analytics for learning velocity and plateau detection
+
+---
+
+## 👥 Team
+
+| Member | Role | Contributions |
+|---|---|---|
+| **Harsh Raj** · [GitHub](https://github.com/Harsh28-raj) · [LinkedIn](https://linkedin.com/in/harsh-raj4308g) | **AI / ML & Backend** | Learner model, weakness detector, adaptive difficulty, recommendation engine, cold-start profiler, LLM pipeline (tutor, question generator, verifier), guardrails, single-endpoint API, deployment |
+| **Ujjwal Chauhan** | **Backend** | Backend development and integration |
+| **Akshat Sharma** | **Frontend** | React app, UI/UX, pages and API integration |
+
+---
+
+<div align="center">
+
+**Built with ❤️ to make AI education adaptive, not one-size-fits-all.**
+
+⭐ Star the repo if you found it useful!
+
+</div>
